@@ -29,33 +29,32 @@
             --radius-lg: 16px;
         }
 
-        /* --- PHYSICS CURSOR --- */
-        @media (hover: hover) and (pointer: fine) {
-            body {
-                cursor: none;
-            }
-
-            a,
-            button,
-            .play-btn,
-            .lightbox-close {
-                cursor: none;
-            }
+        /* --- PHYSICS CURSOR (HIDDEN INITIALLY, SHOWN DURING/AFTER ERASER MAGIC) --- */
+        body.hide-system-cursor,
+        body.hide-system-cursor a,
+        body.hide-system-cursor button,
+        body.hide-system-cursor input,
+        body.hide-system-cursor textarea,
+        body.hide-system-cursor .play-btn,
+        body.hide-system-cursor .lightbox-close {
+            cursor: none !important;
         }
 
         .cursor-dot {
             position: fixed;
             top: 0;
             left: 0;
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
             background: #FFF;
             mix-blend-mode: difference;
             border-radius: 50%;
             pointer-events: none;
             z-index: 100000;
             will-change: transform;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, background-color 0.4s;
+            opacity: 0;
+            transform: translate(-50%, -50%);
         }
 
         .cursor-ring {
@@ -70,10 +69,16 @@
             pointer-events: none;
             z-index: 99999;
             will-change: transform;
-            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s, opacity 0.4s;
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+        }
+
+        body.cursor-ready .cursor-ring.active-ring {
+            opacity: 1;
         }
 
         .cursor-text {
@@ -95,7 +100,7 @@
         }
 
         .cursor-hover .cursor-dot {
-            transform: scale(0.5);
+            transform: translate(-50%, -50%) scale(0.5);
         }
 
         .cursor-btn-nav-hover .cursor-ring {
@@ -134,7 +139,7 @@
             letter-spacing: 1px;
         }
 
-        /* --- PRELOADER --- */
+        /* --- PRELOADER (ERASER EDITION) --- */
         #preloader {
             position: fixed;
             top: 0;
@@ -154,6 +159,19 @@
             text-align: center;
         }
 
+        .loading-text-wrapper {
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
+        }
+
+        .text-and-slash {
+            position: relative;
+            display: inline-block;
+            clip-path: inset(-50% 0% -50% -50%);
+            /* Fully visible initially */
+        }
+
         .loading-text {
             font-family: 'Inter', sans-serif;
             font-size: clamp(2rem, 5vw, 4.5rem);
@@ -165,32 +183,39 @@
             z-index: 3;
         }
 
+        /* The specific dot in ARYVOX.COM */
+        #text-dot {
+            display: inline-block;
+            transition: opacity 0.1s;
+        }
+
         .loading-percentage {
+            position: absolute;
+            bottom: 40vh;
+            left: 50%;
+            transform: translateX(-50%);
             font-family: 'Inter', sans-serif;
             font-size: 1rem;
             font-weight: 500;
             color: #6B7280;
             letter-spacing: 1px;
+            transition: opacity 0.3s ease;
+            z-index: 3;
         }
 
-        /* --- PRELOADER SVG LINE --- */
-        .loading-text-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
+        /* --- REDRAWN RED SLASH (Extended A side, Fades out after M) --- */
         .red-slash {
             position: absolute;
-            top: 0;
-            left: -10%;
-            width: 120%;
-            height: 100%;
+            top: 15%;
+            left: -25%;
+            width: 150%;
+            height: 120%;
             pointer-events: none;
             z-index: 2;
         }
 
         .red-slash path {
-            stroke: #FF4C4C;
+            stroke: url(#fadeRed);
             stroke-width: 6px;
             fill: none;
             stroke-linecap: round;
@@ -218,7 +243,7 @@
             background-color: var(--bg-page);
             color: var(--text-main);
             line-height: 1.6;
-            overflow-x: hidden;
+            overflow-x: clip;
             display: flex;
             flex-direction: column;
         }
@@ -231,7 +256,6 @@
             margin-bottom: 100vh;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
             border-radius: 0 0 40px 40px;
-            overflow: hidden;
         }
 
         .faq-section {
@@ -266,7 +290,7 @@
         }
 
         .text-mask {
-            overflow: hidden;
+            overflow: visible;
             display: inline-block;
             vertical-align: top;
         }
@@ -276,7 +300,6 @@
             transform: translateY(100%);
         }
 
-        /* Sync text reveal class for Manifesto */
         .gsap-manifesto-reveal {
             display: inline-block;
             transform: translateY(110%);
@@ -326,7 +349,8 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             padding: 16px 0;
-            transition: all 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+            will-change: transform;
         }
 
         .nav-inner {
@@ -791,6 +815,7 @@
             position: relative;
             overflow: hidden;
             padding: 0;
+            border-top-left-radius: 100px;
         }
 
         .horizontal-wrapper {
@@ -931,7 +956,6 @@
             letter-spacing: -0.3px;
         }
 
-        /* LOOPY SWOOSH SVG ARROW */
         .swoosh-arrow {
             width: 75px;
             height: auto;
@@ -955,7 +979,6 @@
             position: relative;
         }
 
-        /* --- TILTED GLASSMORPHISM CAPSULE STYLE --- */
         .category-pill {
             background: rgba(159, 161, 255, 0.1);
             backdrop-filter: blur(12px);
@@ -972,7 +995,15 @@
             letter-spacing: 2px;
         }
 
-        /* --- CINEMATIC SERVICES GRID --- */
+        /* --- SERVICES SECTION FIXES --- */
+        .services-section {
+            background: var(--bg-alt);
+            padding-top: 120px;
+            padding-bottom: 120px;
+            border-top-right-radius: 100px;
+            border-top: 1px solid var(--border-color);
+        }
+
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
@@ -981,35 +1012,19 @@
             perspective: 1000px;
         }
 
-        .col-3 {
-            grid-column: span 3;
-        }
-
         .col-4 {
             grid-column: span 4;
         }
 
-        .col-6 {
-            grid-column: span 6;
-        }
-
         @media (max-width: 900px) {
-
-            .col-3,
-            .col-4,
-            .col-6 {
+            .col-4 {
                 grid-column: span 12;
-            }
-
-            .nav-links {
-                display: none;
             }
         }
 
         .service-card {
-            background: #111827;
-            /* Dark Base */
-            border: 1px solid #374151;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 40px;
             box-shadow: var(--shadow-sm);
@@ -1029,7 +1044,6 @@
             transition: transform 0.4s ease, color 0.4s ease;
         }
 
-        /* The Hover Video */
         .service-video-bg {
             position: absolute;
             top: 0;
@@ -1041,37 +1055,25 @@
             opacity: 0;
             transition: opacity 0.5s ease, transform 0.8s ease;
             transform: scale(1.1);
-            /* Slight zoom in on base */
             pointer-events: none;
-            filter: brightness(0.4);
-            /* Keep text readable */
+            filter: brightness(0.3);
         }
 
         .service-card:hover {
             transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.15);
             border-color: rgba(159, 161, 255, 0.5);
         }
 
         .service-card:hover .service-video-bg {
             opacity: 1;
             transform: scale(1);
-            /* Zooms out slightly on hover */
         }
 
-        .service-card .icon-box {
-            width: 64px;
-            height: 64px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--color-primary);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: auto;
-            /* Pushes text to the bottom */
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
+        .service-card:hover h3,
+        .service-card:hover p {
+            color: #FFF;
+            transform: translateY(-5px);
         }
 
         .service-card:hover .icon-box {
@@ -1084,26 +1086,35 @@
 
         .service-card h3 {
             font-size: 1.5rem;
-            color: #FFF;
+            color: var(--text-main);
             margin-bottom: 8px;
             font-family: 'Inter', sans-serif;
             font-weight: 800;
+            transition: color 0.4s ease, transform 0.4s ease;
         }
 
         .service-card p {
-            color: #9CA3AF;
+            color: var(--text-muted);
             font-size: 1rem;
             margin: 0;
+            transition: color 0.4s ease, transform 0.4s ease;
         }
 
-        .service-card:hover h3,
-        .service-card:hover p {
-            transform: translateY(-5px);
-            /* Lift text slightly on hover */
+        .service-card .icon-box {
+            width: 64px;
+            height: 64px;
+            background: rgba(159, 161, 255, 0.1);
+            color: var(--color-primary-dark);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: auto;
+            border: 1px solid rgba(159, 161, 255, 0.3);
+            transition: var(--transition);
         }
 
-
-        /* Process Timeline */
+        /* --- WORKFLOW TIMELINE --- */
         .process-section {
             background: var(--bg-alt);
             padding: 120px 0;
@@ -1113,7 +1124,7 @@
         .timeline-container {
             position: relative;
             margin-top: 60px;
-            padding-left: 60px;
+            padding-left: 80px;
         }
 
         .scroll-line-track {
@@ -1124,6 +1135,7 @@
             width: 4px;
             background: var(--border-color);
             border-radius: 4px;
+            z-index: 1;
         }
 
         .scroll-line-fill {
@@ -1136,6 +1148,7 @@
             transition: height 0.1s ease-out;
             border-radius: 4px;
             box-shadow: 0 0 15px rgba(201, 110, 43, 0.5);
+            z-index: 1;
         }
 
         .process-item {
@@ -1146,6 +1159,7 @@
             opacity: 0.4;
             transition: var(--transition);
             transform: translateX(-20px);
+            z-index: 2;
         }
 
         .process-item:last-child {
@@ -1190,7 +1204,7 @@
             transform: scale(1.1);
         }
 
-        /* FAQ Section */
+        /* --- PERFECT BILL CHIEN STICKY FAQ --- */
         .faq-section {
             background: var(--bg-card);
             padding: 150px 0;
@@ -1203,7 +1217,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 80px;
-            align-items: flex-start;
+            align-items: stretch;
+            position: relative;
         }
 
         @media (max-width: 900px) {
@@ -1216,7 +1231,7 @@
             display: flex;
             flex-direction: column;
             gap: 60px;
-            padding-bottom: 20vh;
+            padding-bottom: 10vh;
         }
 
         .faq-item {
@@ -1262,20 +1277,20 @@
             font-weight: 500;
         }
 
+        /* The sticky Q&A side container */
         .faq-right {
             position: sticky;
-            top: 20vh;
+            top: 30vh;
             height: fit-content;
             display: flex;
-            align-items: flex-start;
             justify-content: center;
+            align-self: start;
         }
 
         @media (max-width: 900px) {
             .faq-right {
                 position: relative;
                 top: 0;
-                height: auto;
                 margin-bottom: 40px;
                 grid-row: 1;
                 justify-content: flex-start;
@@ -1315,62 +1330,86 @@
         .footer-content-wrapper {
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 40px 24px;
             position: relative;
-            height: 100%;
+            height: 100vh;
+        }
+
+        .footer-center-block {
+            display: flex;
+            flex-direction: column;
             justify-content: center;
+            flex-grow: 1;
+            width: 100%;
+            align-items: center;
         }
 
         .footer-huge-text-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
-            margin-bottom: 50px;
+            gap: 0px;
+            margin-bottom: 10px;
+        }
+
+        .footer-text-mask {
+            overflow: hidden;
+            display: block;
+            width: 100%;
         }
 
         .line-1 {
-            align-self: center;
             font-family: 'Archivo Black', sans-serif;
             font-weight: 400;
-            font-size: clamp(4rem, 12vw, 10rem);
-            line-height: 1.05;
+            font-size: clamp(3rem, min(10vw, 12vh), 9rem);
+            line-height: 1.1;
             letter-spacing: -2px;
             color: #FFF;
             text-transform: uppercase;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
 
         .line-2 {
-            align-self: flex-start;
             font-family: 'Archivo Black', sans-serif;
             font-weight: 400;
-            font-size: clamp(4rem, 12vw, 10rem);
-            line-height: 1.05;
+            font-size: clamp(3rem, min(10vw, 12vh), 9rem);
+            line-height: 1.1;
             letter-spacing: -2px;
             color: #FFF;
             text-transform: uppercase;
+            margin: 0;
+            padding: 0;
+            text-align: left;
         }
 
         .line-3 {
-            align-self: flex-end;
             font-family: 'Bodoni Moda', serif;
             font-style: normal;
             font-weight: 700;
-            font-size: clamp(4.5rem, 13vw, 11rem);
-            line-height: 0.9;
+            font-size: clamp(3.5rem, min(11vw, 13vh), 10rem);
+            line-height: 1;
             color: var(--color-highlight);
             padding-right: 5%;
             letter-spacing: -1px;
             text-transform: uppercase;
+            margin: 0;
+            padding: 0;
+            text-align: right;
         }
 
         .btn-container {
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 40px;
             width: 100%;
+            overflow: visible;
         }
 
         .footer-massive-btn {
@@ -1388,7 +1427,7 @@
             box-shadow: 0 10px 30px rgba(201, 110, 43, 0.4);
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: box-shadow 0.3s ease, background 0.3s ease;
+            transition: box-shadow 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
         }
 
@@ -1399,21 +1438,19 @@
         }
 
         .footer-bottom {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding-top: 32px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+            max-width: 1152px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 14px;
+            margin-top: 14px;
             font-size: 0.95rem;
             color: #9CA3AF;
             font-family: 'Inter', sans-serif;
             font-weight: 500;
-            width: 100%;
-            max-width: 1152px;
+            flex-shrink: 0;
         }
 
         .insta-link {
@@ -1463,9 +1500,15 @@
 
         @media (max-width: 768px) {
             .footer-bottom {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                transform: none;
+                width: 100%;
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
+                margin-bottom: 20px;
             }
         }
 
@@ -1548,12 +1591,28 @@
     </div>
 
     <div id="preloader">
-        <div class="preloader-content">
-            <div class="loading-text-wrapper">
-                <div class="loading-text">ARYVOX.COM</div>
-                <svg class="red-slash" viewBox="0 0 300 100" preserveAspectRatio="none">
-                    <path d="M 40,60 Q 30,20 100,20 T 150,45 Q 165,80 200,60 Q 220,40 240,40 Q 270,40 280,20" />
-                </svg>
+        <div class="preloader-content" id="preloader-content">
+            <div class="loading-text-wrapper" id="loading-wrapper">
+
+                <div class="text-and-slash" id="text-and-slash">
+                    <div class="loading-text" id="loading-word">ARYVOX<span id="text-dot"
+                            style="transition: opacity 0.1s;">.</span>COM</div>
+
+                    <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="fadeRed" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#FF4C4C" stop-opacity="1" />
+                                <stop offset="75%" stop-color="#FF4C4C" stop-opacity="1" />
+                                <stop offset="100%" stop-color="#FF4C4C" stop-opacity="0" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+
+                    <svg class="red-slash" viewBox="-50 0 400 100" preserveAspectRatio="none">
+                        <path d="M -60,85 Q 150,55 450,15" />
+                    </svg>
+                </div>
+
             </div>
             <div class="loading-percentage" id="counter">0%</div>
         </div>
@@ -1579,7 +1638,7 @@
                     <a href="#process" class="nav-link hover-target">Workflow</a>
                     <a href="#faq" class="nav-link hover-target">FAQ</a>
                 </div>
-                <a href="#contact" class="btn contact-btn-nav magnet-btn">Start Project</a>
+                <a href="contact.html" class="btn contact-btn-nav magnet-btn">Start Project</a>
             </div>
         </nav>
 
@@ -1821,7 +1880,7 @@
             </div>
         </section>
 
-        <section id="services" style="background: var(--bg-alt); border-top: 1px solid var(--border-color);">
+        <section id="services" class="services-section">
             <div class="container">
                 <div style="text-align: left; margin-bottom: 40px;" class="gsap-fade">
                     <span class="section-label">Services</span>
@@ -1834,9 +1893,8 @@
                 </div>
 
                 <div class="bento-grid">
-
-                    <div class="col-4 service-card hover-target gsap-card">
-                        <video class="service-video-bg" src="src/Airise.mp4" autoplay loop muted playsinline></video>
+                    <div class="col-4 service-card hover-target gsap-fade">
+                        <video class="service-video-bg" src="src/Airise.mp4" loop muted playsinline></video>
                         <div class="icon-box">
                             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"
                                 viewBox="0 0 24 24">
@@ -1850,9 +1908,8 @@
                         </p>
                     </div>
 
-                    <div class="col-4 service-card hover-target gsap-card">
-                        <video class="service-video-bg" src="src/Deflationlongforn.mp4" autoplay loop muted
-                            playsinline></video>
+                    <div class="col-4 service-card hover-target gsap-fade">
+                        <video class="service-video-bg" src="src/Deflationlongforn.mp4" loop muted playsinline></video>
                         <div class="icon-box">
                             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"
                                 viewBox="0 0 24 24">
@@ -1866,9 +1923,8 @@
                             viewers watching longer.</p>
                     </div>
 
-                    <div class="col-4 service-card hover-target gsap-card">
-                        <video class="service-video-bg" src="src/Resultdrivenlongforn.mp4" autoplay loop muted
-                            playsinline></video>
+                    <div class="col-4 service-card hover-target gsap-fade">
+                        <video class="service-video-bg" src="src/Spendonsocialmedia.mp4" loop muted playsinline></video>
                         <div class="icon-box">
                             <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"
                                 viewBox="0 0 24 24">
@@ -1957,6 +2013,28 @@
                         <p>Yes, we refine pacing, hooks, and structure to improve overall engagement and long-term
                             viewer retention.</p>
                     </div>
+                    <div class="faq-item gsap-fade hover-target">
+                        <h4>How do we send our large raw video files to you?</h4>
+                        <p>You can seamlessly upload your files using Google Drive, Dropbox, or Frame.io. We manage
+                            everything safely without quality loss.</p>
+                    </div>
+                    <div class="faq-item gsap-fade hover-target">
+                        <h4>Can you repurpose my long YouTube videos into shorts?</h4>
+                        <p>Absolutely. We specialize in extraction strategy—finding the most viral, high-retention hooks
+                            inside your long-form footage and splicing them into high-performing short form assets.</p>
+                    </div>
+                    <div class="faq-item gsap-fade hover-target">
+                        <h4>Do your services include sound design and color grading?</h4>
+                        <p>Yes, every video goes through our premium post-production pipeline: professional audio
+                            engineering (sound design, SFX, leveling) and cinematic color grading tailored to your
+                            brand.</p>
+                    </div>
+                    <div class="faq-item gsap-fade hover-target">
+                        <h4>How do you ensure the editing style matches my personal brand?</h4>
+                        <p>Before launching, we conduct a deep audit of your current portfolio, establish a custom asset
+                            style guide, and analyze your target demographics to keep your brand voice organically
+                            uniform.</p>
+                    </div>
                 </div>
 
                 <div class="faq-right">
@@ -1971,25 +2049,26 @@
     <footer id="contact" class="hover-target-footer">
         <div class="container footer-content-wrapper">
 
-            <div class="footer-huge-text-wrapper">
-                <div class="text-mask" style="align-self: center;">
-                    <div class="line-1 glitch-text gsap-footer-text">BRINGING</div>
-                </div>
-                <div class="text-mask" style="align-self: flex-start;">
-                    <div class="line-2 glitch-text gsap-footer-text">STORIES</div>
-                </div>
-                <div class="text-mask" style="align-self: flex-end;">
-                    <div class="line-3 gsap-footer-text">TO LIFE</div>
-                </div>
-            </div>
+            <div class="footer-center-block">
 
-            <div class="btn-container">
-                <div class="text-mask">
-                    <a href="mailto:aryan22193225@gmail.com"
-                        class="footer-massive-btn contact-btn-footer magnet-btn gsap-footer-text">
+                <div class="footer-huge-text-wrapper">
+                    <div class="footer-text-mask" style="text-align: center;">
+                        <div class="line-1 glitch-text gsap-footer-text">BRINGING</div>
+                    </div>
+                    <div class="footer-text-mask" style="text-align: left;">
+                        <div class="line-2 glitch-text gsap-footer-text">STORIES</div>
+                    </div>
+                    <div class="footer-text-mask" style="text-align: right;">
+                        <div class="line-3 gsap-footer-text">TO LIFE</div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <a href="contact.html" class="footer-massive-btn contact-btn-footer magnet-btn gsap-footer-text">
                         START A PROJECT
                     </a>
                 </div>
+
             </div>
 
             <div class="footer-bottom">
@@ -2003,6 +2082,7 @@
                     </a>
                 </div>
             </div>
+
         </div>
     </footer>
 
@@ -2012,20 +2092,45 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- MINIMAL SYNCED PRELOADER WITH INK VANISH EFFECT ---
+            // --- THE MAGICAL AUTOMATED ERASER SCRIPT ---
             const preloader = document.getElementById('preloader');
             const counterText = document.getElementById('counter');
-            const preloaderTextWrapper = document.querySelector('.loading-text-wrapper');
-            const redSlash = document.querySelector('.red-slash path');
+            const preloaderTextWrapper = document.getElementById('loading-wrapper');
+            const textAndSlash = document.getElementById('text-and-slash');
+            const loadingWord = document.getElementById('loading-word');
+            const textDot = document.getElementById('text-dot');
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorRing = document.getElementById('cursor-ring');
 
+            // Physics trackers
+            let proxyMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let realMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let cursorScale = { dot: 1 };
+
+            let isCursorReady = false;
+
+            // Constantly track where the hardware mouse is
             window.addEventListener('mousemove', (e) => {
-                if (preloader && !preloader.classList.contains('loaded') && preloaderTextWrapper) {
+                realMouse.x = e.clientX;
+                realMouse.y = e.clientY;
+
+                // If animation is done, lock proxy to hardware mouse
+                if (isCursorReady) {
+                    proxyMouse.x = realMouse.x;
+                    proxyMouse.y = realMouse.y;
+                }
+            });
+
+            // Parallax the wrapper during load
+            window.addEventListener('mousemove', (e) => {
+                if (preloader && !preloader.classList.contains('loaded') && preloaderTextWrapper && !isCursorReady) {
                     const x = (window.innerWidth / 2 - e.clientX) / 40;
                     const y = (window.innerHeight / 2 - e.clientY) / 40;
                     preloaderTextWrapper.style.transform = `translate(${x}px, ${y}px)`;
                 }
             });
 
+            const redSlash = document.querySelector('.red-slash path');
             if (redSlash) {
                 const pathLength = redSlash.getTotalLength();
                 gsap.set(redSlash, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
@@ -2035,21 +2140,101 @@
                 const loaderTimeline = gsap.timeline({
                     onUpdate: () => {
                         if (counterText) counterText.innerText = Math.floor(loaderState.percent) + '%';
-                        let currentOffset = pathLength - (pathLength * (loaderState.percent / 100));
-                        gsap.set(redSlash, { strokeDashoffset: currentOffset });
+                        gsap.set(redSlash, { strokeDashoffset: pathLength - (pathLength * (loaderState.percent / 100)) });
                     },
                     onComplete: () => {
-                        preloader.classList.add('loaded');
-                        gsap.to(redSlash, { opacity: 0, strokeWidth: 0, duration: 1, ease: "power2.out" });
+                        // LOAD HITS 100%
+                        gsap.to(counterText, { opacity: 0, duration: 0.3 });
 
-                        setTimeout(() => {
-                            gsap.to(preloader, { yPercent: -100, duration: 1, ease: 'power4.inOut' });
-                            gsap.to('.gsap-reveal-text', { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
+                        // Extract physical coordinates of the ARYVOX(.)COM dot
+                        const dotRect = textDot.getBoundingClientRect();
+                        const wordRect = textAndSlash.getBoundingClientRect();
 
-                            setTimeout(() => {
-                                initGSAPScroll();
-                            }, 500);
-                        }, 800);
+                        const startX = dotRect.left + (dotRect.width / 2);
+                        const startY = dotRect.top + (dotRect.height / 2);
+
+                        // Snap proxy (fake) cursor exactly to that text dot
+                        proxyMouse.x = startX;
+                        proxyMouse.y = startY;
+                        ringX = startX;
+                        ringY = startY;
+
+                        // Turn cursor dot black so it looks like the text dot lifted off the page
+                        cursorDot.style.backgroundColor = '#111827';
+
+                        // Reveal custom cursor, hide actual text dot
+                        document.body.classList.add('hide-system-cursor');
+                        textDot.style.opacity = 0;
+                        cursorDot.style.opacity = 1;
+
+                        // Scale the dot slightly so it looks like an eraser tool
+                        gsap.to(cursorScale, { dot: 3, duration: 0.3 });
+
+                        // RESET parallax so wiping matches exactly
+                        gsap.to(preloaderTextWrapper, { x: 0, y: 0, duration: 0.3 });
+
+                        // --- THE AUTOMATED ZIGZAG WIPE SEQUENCE ---
+                        const eraseTl = gsap.timeline({
+                            delay: 0.4, // Small pause for dramatic effect
+                            onComplete: () => {
+                                // Erasing is done. Morph to real mouse.
+                                gsap.to(cursorDot, { backgroundColor: '#FFFFFF', duration: 0.3 });
+                                gsap.to(cursorScale, { dot: 1, duration: 0.3 });
+
+                                gsap.to(proxyMouse, {
+                                    x: realMouse.x,
+                                    y: realMouse.y,
+                                    duration: 0.8,
+                                    ease: "back.out(1.2)",
+                                    onComplete: () => {
+                                        isCursorReady = true; // Lock physics cursor to hardware mouse
+                                        document.getElementById('cursor-ring').classList.add('active-ring'); // Show outer ring
+                                        document.body.classList.add('cursor-ready');
+
+                                        preloader.classList.add('loaded'); // Lock states
+
+                                        // Pull curtain up
+                                        gsap.to(preloader, { yPercent: -100, duration: 1, ease: 'power4.inOut' });
+                                        gsap.to('.gsap-reveal-text', { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
+                                        gsap.to('.gsap-footer-text', { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
+
+                                        setTimeout(() => { initGSAPScroll(); }, 800);
+                                    }
+                                });
+                            }
+                        });
+
+                        // 1. Move dot to the far right edge of the word
+                        eraseTl.to(proxyMouse, {
+                            x: wordRect.right + 20,
+                            y: wordRect.top + (wordRect.height / 2),
+                            duration: 0.5,
+                            ease: "power2.inOut"
+                        });
+
+                        // 2. The physical scrubbing motion to the left
+                        const wipeDuration = 1.8;
+                        eraseTl.to(proxyMouse, {
+                            x: wordRect.left - 40, // End past 'A'
+                            duration: wipeDuration,
+                            ease: "none"
+                        }, "eraseStart");
+
+                        // 3. Up/Down rubbing motion (Simulating a hand)
+                        eraseTl.to(proxyMouse, {
+                            y: wordRect.top + (wordRect.height / 2) - 25,
+                            duration: 0.1,
+                            yoyo: true,
+                            repeat: Math.floor(wipeDuration / 0.1),
+                            ease: "sine.inOut"
+                        }, "eraseStart");
+
+                        // 4. Visually mask the text away (Right to Left)
+                        eraseTl.to(textAndSlash, {
+                            clipPath: 'inset(-50% 100% -50% -50%)', // Right edge pulls all the way in
+                            duration: wipeDuration,
+                            ease: "none"
+                        }, "eraseStart+=0.05"); // Tiny offset so dot leads the wipe
                     }
                 });
 
@@ -2059,7 +2244,23 @@
                     .to(loaderState, { percent: 100, duration: 1.4, ease: "power2.inOut" });
             }
 
+            // Initialization states
             gsap.set('.gsap-reveal-text', { y: 100 });
+            gsap.set('.gsap-footer-text', { y: 150 });
+
+            // --- SMART NAVBAR HIDE/SHOW ON SCROLL ---
+            const navbar = document.getElementById('navbar');
+            let lastScrollTop = 0;
+
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > lastScrollTop && scrollTop > 150) {
+                    navbar.style.transform = 'translateY(-100%)'; // Downscroll - Hide
+                } else {
+                    navbar.style.transform = 'translateY(0)'; // Upscroll - Show
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            });
 
             // --- MANIFESTO SLIDER ---
             const slides = document.querySelectorAll('.stat-slide');
@@ -2086,20 +2287,10 @@
             triggerSliderProgress();
             setInterval(nextSlide, 3000);
 
-            // --- ADVANCED PHYSICS CURSOR LOGIC ---
-            const cursorDot = document.getElementById('cursor-dot');
-            const cursorRing = document.getElementById('cursor-ring');
-
-            let mouseX = window.innerWidth / 2;
-            let mouseY = window.innerHeight / 2;
-            let ringX = mouseX;
-            let ringY = mouseY;
+            // --- ADVANCED PHYSICS CURSOR RENDER LOOP ---
+            let ringX = window.innerWidth / 2;
+            let ringY = window.innerHeight / 2;
             let currentScroll = window.scrollY;
-
-            window.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
 
             // --- SCROLL-DEPENDENT MARQUEE & TIMELINE LOGIC ---
             let marqueePos = 0;
@@ -2144,10 +2335,11 @@
             });
 
             function renderLoop() {
-                if (cursorDot) cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                // Core Physics updates with scaling
+                if (cursorDot) cursorDot.style.transform = `translate3d(${proxyMouse.x}px, ${proxyMouse.y}px, 0) translate(-50%, -50%) scale(${cursorScale.dot})`;
 
-                ringX += (mouseX - ringX) * 0.15;
-                ringY += (mouseY - ringY) * 0.15;
+                ringX += (proxyMouse.x - ringX) * 0.15;
+                ringY += (proxyMouse.y - ringY) * 0.15;
                 if (cursorRing) cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
 
                 marqueePos += scrollVelocity;
@@ -2158,14 +2350,14 @@
                     marqueeTrack.style.transform = `translate3d(${marqueePos}%, 0, 0)`;
                 }
 
-                // --- ZERO-GRAVITY MOUSE PARALLAX FOR BACKGROUND VIDEOS ---
+                // ZERO-GRAVITY MOUSE PARALLAX FOR BACKGROUND VIDEOS
                 const floatWrappers = document.querySelectorAll('.floating-wrap');
                 floatWrappers.forEach(wrap => {
                     const speed = parseFloat(wrap.getAttribute('data-speed'));
                     const vid = wrap.querySelector('video');
                     if (vid) {
-                        const xOffset = (window.innerWidth / 2 - mouseX) * speed;
-                        const yOffset = (window.innerHeight / 2 - mouseY) * speed;
+                        const xOffset = (window.innerWidth / 2 - proxyMouse.x) * speed;
+                        const yOffset = (window.innerHeight / 2 - proxyMouse.y) * speed;
                         gsap.to(vid, { x: xOffset, y: yOffset, duration: 1.5, ease: "power2.out", overwrite: "auto" });
                     }
                 });
@@ -2192,6 +2384,18 @@
                 contactBtnFooter.addEventListener('mouseenter', () => document.body.classList.add('cursor-btn-footer-hover'));
                 contactBtnFooter.addEventListener('mouseleave', () => document.body.classList.remove('cursor-btn-footer-hover'));
             }
+
+            // --- SERVICES VIDEO HOVER PLAY ---
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                const vid = card.querySelector('.service-video-bg');
+                card.addEventListener('mouseenter', () => {
+                    if (vid) vid.play();
+                });
+                card.addEventListener('mouseleave', () => {
+                    if (vid) vid.pause();
+                });
+            });
 
             // --- GSAP ADVANCED OVERWRITE MAGNETIC BUTTONS ---
             const magneticButtons = document.querySelectorAll('.magnet-btn');
@@ -2221,7 +2425,7 @@
 
             function initGSAPScroll() {
 
-                // --- ZERO-GRAVITY SCROLL PARALLAX ---
+                // ZERO-GRAVITY SCROLL PARALLAX
                 const heroVideoBg = document.getElementById('hero-video-bg');
                 if (heroVideoBg) {
                     gsap.to(heroVideoBg, {
@@ -2236,7 +2440,7 @@
                     });
                 }
 
-                // --- TRUE DIAGONAL MANIFESTO WIPE (Top-Left to Bottom-Right) ---
+                // TRUE DIAGONAL MANIFESTO WIPE
                 gsap.to('.manifesto-quote', {
                     backgroundPosition: "0% 0%",
                     ease: "none",
@@ -2248,12 +2452,12 @@
                     }
                 });
 
-                // --- HORIZONTAL FRAME PINNING RUNTIME ---
+                // HORIZONTAL FRAME PINNING RUNTIME
                 const horizontalWrapper = document.querySelector(".horizontal-wrapper");
                 const horizontalContainer = document.querySelector(".horizontal-container");
 
                 if (horizontalWrapper && horizontalContainer) {
-                    let computeScrollDistance = () => -(horizontalContainer.scrollWidth - window.innerWidth + 48);
+                    let computeScrollDistance = () => -(horizontalContainer.scrollWidth - window.innerWidth + 150);
 
                     const slideTween = gsap.to(horizontalContainer, {
                         x: computeScrollDistance,
@@ -2263,7 +2467,7 @@
                     ScrollTrigger.create({
                         trigger: horizontalWrapper,
                         start: "top top",
-                        end: () => `+=${horizontalContainer.scrollWidth - window.innerWidth}`,
+                        end: () => `+=${horizontalContainer.scrollWidth - window.innerWidth + 150}`,
                         pin: true,
                         animation: slideTween,
                         scrub: 1,
@@ -2303,10 +2507,10 @@
                     });
                 });
 
-                // Footer Stagger Text Reveal
+                // Footer Stagger Text Reveal (Fixed targeting)
                 gsap.from('.gsap-footer-text', {
-                    scrollTrigger: { trigger: 'footer', start: "top 70%" },
-                    y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "power4.out"
+                    scrollTrigger: { trigger: 'footer', start: "top 80%" },
+                    y: 150, opacity: 0, duration: 1, stagger: 0.2, ease: "power4.out"
                 });
 
                 // Activate Section Labels
@@ -2356,6 +2560,10 @@
                 if (e.key === "Escape" && lightbox.classList.contains('active')) closeLightbox();
             });
 
+        });
+
+        window.addEventListener('load', () => {
+            ScrollTrigger.refresh();
         });
     </script>
 </body>

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Aryvox</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Inter:wght@400;500;600;700;800&family=Anton&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --color-primary: #9FA1FF;
+            --color-primary-dark: #7A7DE0;
+            --color-highlight: #C96E2B;
+
+            /* Light Mode Theme for Contact Page */
+            --bg-page: #FCFCFD;
+            --bg-card: #FFFFFF;
+            --bg-alt: #F9FAFB;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+
+            --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --glitch-offset: 0px;
+        }
+
+        /* --- PHYSICS CURSOR --- */
+        @media (hover: hover) and (pointer: fine) {
+            body {
+                cursor: none;
+            }
+
+            a,
+            button,
+            input,
+            textarea {
+                cursor: none;
+            }
+        }
+
+        .cursor-dot {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 8px;
+            background: #FFF;
+            mix-blend-mode: difference;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100000;
+            will-change: transform;
+            transition: opacity 0.2s;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #FFF;
+            mix-blend-mode: difference;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            will-change: transform;
+            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cursor-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            opacity: 0;
+            white-space: nowrap;
+            text-transform: uppercase;
+            transition: opacity 0.3s;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .cursor-hover .cursor-ring {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .cursor-hover .cursor-dot {
+            transform: scale(0.5);
+        }
+
+        .cursor-btn-hover .cursor-ring {
+            mix-blend-mode: normal;
+            background: #111;
+            border-color: transparent;
+            width: 90px;
+            height: 90px;
+        }
+
+        .cursor-btn-hover .cursor-dot {
+            opacity: 0;
+        }
+
+        .cursor-btn-hover .cursor-text {
+            color: #FFF;
+            opacity: 1;
+            letter-spacing: 1px;
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #FFFFFF;
+            z-index: 90000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        .preloader-content {
+            text-align: center;
+        }
+
+        .loading-text {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-weight: 800;
+            color: #111827;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .loading-percentage {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6B7280;
+            letter-spacing: 1px;
+        }
+
+        .loading-text-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .red-slash {
+            position: absolute;
+            top: 0;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .red-slash path {
+            stroke: #2ea043;
+            /* Changed to Green */
+            stroke-width: 6px;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* --- GLOBAL --- */
+        html {
+            scroll-behavior: smooth;
+            background: var(--bg-page);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: clip;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .noise-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 80000;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .text-mask {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .gsap-reveal-text {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 50000;
+            background: rgba(252, 252, 253, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 0;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--color-highlight);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--color-highlight);
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            color: var(--text-main);
+            padding: 12px 28px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #111;
+            color: #FFF;
+            border-color: #111;
+        }
+
+        /* --- CONTACT SECTION --- */
+        .contact-page-wrapper {
+            padding: 180px 0 100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 900px) {
+            .contact-page-wrapper {
+                grid-template-columns: 1fr;
+                gap: 60px;
+                padding-top: 140px;
+            }
+        }
+
+        /* Left Side */
+        .contact-left {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .contact-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(3.5rem, 6vw, 6rem);
+            line-height: 1;
+            letter-spacing: -2px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .contact-subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 700;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            line-height: 1;
+            color: var(--color-highlight);
+            text-transform: none;
+            margin: -10px 0 0 0;
+        }
+
+        .contact-desc {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 90%;
+            margin-top: 20px;
+        }
+
+        .info-block-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 40px;
+        }
+
+        .info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        .info-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .info-link {
+            color: var(--color-highlight);
+            text-decoration: none;
+            position: relative;
+            display: inline-block;
+            width: fit-content;
+            font-weight: 700;
+        }
+
+        .info-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--color-highlight);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .info-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Right Side (Form) */
+        .contact-form-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 50px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 600px) {
+            .contact-form-wrapper {
+                padding: 30px 20px;
+            }
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+            outline: none;
+            border-radius: 0;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-weight: 500;
+        }
+
+        /* Floating label magic */
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-bottom-color: var(--color-highlight);
+        }
+
+        .input-group input:focus~label,
+        .input-group input:not(:placeholder-shown)~label,
+        .input-group textarea:focus~label,
+        .input-group textarea:not(:placeholder-shown)~label {
+            top: -20px;
+            font-size: 0.8rem;
+            color: var(--color-highlight);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #FFF;
+            background: #111;
+            border: none;
+            padding: 20px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: box-shadow 0.3s ease, background 0.3s ease;
+            will-change: transform;
+            cursor: none;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: var(--color-highlight);
+            color: #FFF;
+            box-shadow: 0 10px 30px rgba(201, 110, 43, 0.3);
+        }
+
+        /* Success Message */
+        .success-msg {
+            display: none;
+            text-align: center;
+            color: #2ea043;
+            font-weight: 700;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="loading-text-wrapper">
+                <div class="loading-text">ARYVOX.COM</div>
+                <svg class="red-slash" viewBox="0 0 300 100" preserveAspectRatio="none">
+                    <path d="M 40,60 Q 30,20 100,20 T 150,45 Q 165,80 200,60 Q 220,40 240,40 Q 270,40 280,20" />
+                </svg>
+            </div>
+            <div class="loading-percentage" id="counter">0%</div>
+        </div>
+    </div>
+
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-ring" id="cursor-ring">
+        <span class="cursor-text" id="cursor-text">SEND</span>
+    </div>
+
+    <div class="noise-bg"></div>
+
+    <nav id="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo hover-target">
+                <div class="logo-dot"></div> ARYVOX
+            </a>
+            <a href="index.html" class="btn-outline hover-target magnet-btn">Back to Home</a>
+        </div>
+    </nav>
+
+    <main class="container contact-page-wrapper">
+
+        <div class="contact-left">
+            <div>
+                <div class="text-mask">
+                    <h1 class="contact-title gsap-reveal-text">LET'S BUILD</h1>
+                </div><br>
+                <div class="text-mask">
+                    <h2 class="contact-subtitle gsap-reveal-text">Something Iconic.</h2>
+                </div>
+                <p class="contact-desc gsap-fade">We partner with creators and brands who are serious about scaling.
+                    Fill out the form, and we'll audit your current content and build a custom strategy.</p>
+            </div>
+
+            <div class="info-block-container gsap-fade">
+                <div class="info-block hover-target">
+                    <span class="info-label">EMAIL US</span>
+                    <a href="mailto:aryan22193225@gmail.com" class="info-link info-text">aryan22193225@gmail.com</a>
+                </div>
+
+                <div class="info-block hover-target" style="margin-top: 10px;">
+                    <span class="info-label">HEADQUARTERS</span>
+                    <span class="info-text">Asthawan, Nalanda<br>Bihar, India</span>
+                </div>
+
+                <div class="info-block hover-target" style="margin-top: 10px;">
+                    <span class="info-label">SOCIALS</span>
+                    <a href="https://www.instagram.com/aryvox.ind?igsh=YWhpcGk2Zmg2Y2xpand" target="_blank"
+                        class="info-link info-text">Instagram ↗</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrapper gsap-form">
+            <form id="contact-form">
+                <div class="input-group hover-target">
+                    <input type="text" id="name" name="name" placeholder=" " required>
+                    <label for="name">What's your name?</label>
+                </div>
+
+                <div class="input-group hover-target">
+                    <input type="email" id="email" name="email" placeholder=" " required>
+                    <label for="email">Your email address</label>
+                </div>
+
+                <div class="input-group hover-target">
+                    <input type="tel" id="phone" name="phone" placeholder=" " required>
+                    <label for="phone">Your phone number</label>
+                </div>
+
+                <div class="input-group hover-target">
+                    <input type="text" id="brand" name="brand" placeholder=" ">
+                    <label for="brand">Brand / Channel Name (Optional)</label>
+                </div>
+
+                <div class="input-group hover-target">
+                    <textarea id="message" name="message" placeholder=" " required></textarea>
+                    <label for="message">Tell us about your goals...</label>
+                </div>
+
+                <button type="submit" class="submit-btn hover-action magnet-btn">SEND INQUIRY</button>
+                <div class="success-msg" id="success-msg">Redirecting to WhatsApp...</div>
+            </form>
+        </div>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- PRELOADER ---
+            const preloader = document.getElementById('preloader');
+            const counterText = document.getElementById('counter');
+            const redSlash = document.querySelector('.red-slash path');
+
+            if (redSlash) {
+                const pathLength = redSlash.getTotalLength();
+                gsap.set(redSlash, { strokeDasharray: pathLength, strokeDashoffset: pathLength });
+
+                let loaderState = { percent: 0 };
+
+                const loaderTimeline = gsap.timeline({
+                    onUpdate: () => {
+                        if (counterText) counterText.innerText = Math.floor(loaderState.percent) + '%';
+                        gsap.set(redSlash, { strokeDashoffset: pathLength - (pathLength * (loaderState.percent / 100)) });
+                    },
+                    onComplete: () => {
+                        preloader.style.pointerEvents = 'none';
+                        gsap.to(redSlash, { opacity: 0, strokeWidth: 0, duration: 1, ease: "power2.out" });
+
+                        setTimeout(() => {
+                            gsap.to(preloader, { yPercent: -100, duration: 1, ease: 'power4.inOut' });
+
+                            // Intro Animations
+                            gsap.to('.gsap-reveal-text', { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
+                            gsap.fromTo('.gsap-fade', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.6 });
+                            gsap.fromTo('.gsap-form', { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1.2, ease: 'power4.out', delay: 0.8 });
+
+                        }, 500);
+                    }
+                });
+
+                loaderTimeline
+                    .to(loaderState, { percent: 30, duration: 0.4, ease: "none" })
+                    .to(loaderState, { percent: 100, duration: 1, ease: "power2.inOut" });
+            }
+
+            // --- CURSOR LOGIC ---
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorRing = document.getElementById('cursor-ring');
+            let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+            let ringX = mouseX, ringY = mouseY;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function renderLoop() {
+                if (cursorDot) cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                ringX += (mouseX - ringX) * 0.15;
+                ringY += (mouseY - ringY) * 0.15;
+                if (cursorRing) cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+                requestAnimationFrame(renderLoop);
+            }
+            requestAnimationFrame(renderLoop);
+
+            // Cursor Hover States
+            document.querySelectorAll('.hover-target').forEach(target => {
+                target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+
+            document.querySelectorAll('.hover-action').forEach(target => {
+                target.addEventListener('mouseenter', () => document.body.classList.add('cursor-btn-hover'));
+                target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-btn-hover'));
+            });
+
+            // --- MAGNETIC BUTTONS ---
+            const magneticButtons = document.querySelectorAll('.magnet-btn');
+            magneticButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    gsap.to(btn, { scale: 1.05, duration: 0.3, ease: "power2.out", overwrite: "auto" });
+                });
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = (e.clientX - rect.left - rect.width / 2);
+                    const y = (e.clientY - rect.top - rect.height / 2);
+                    gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power3.out", overwrite: "auto" });
+                });
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, { x: 0, y: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.3)", overwrite: "auto" });
+                });
+            });
+
+            // --- WHATSAPP FORM INTEGRATION ---
+            const form = document.getElementById('contact-form');
+            const submitBtn = document.querySelector('.submit-btn');
+            const successMsg = document.getElementById('success-msg');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                submitBtn.innerText = "ROUTING...";
+
+                // Get Field Values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const brand = document.getElementById('brand').value || "Not provided";
+                const message = document.getElementById('message').value;
+
+                // Format WhatsApp Message
+                const whatsappMsg = `*New Lead from Aryvox Website*%0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Phone:* ${phone}%0A*Brand/Channel:* ${brand}%0A*Message:* ${message}`;
+
+                // Target Phone Number
+                const targetNumber = "916203954347";
+
+                // Animation and redirect
+                setTimeout(() => {
+                    submitBtn.style.display = 'none';
+                    successMsg.style.display = 'block';
+                    gsap.fromTo(successMsg, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 });
+
+                    // Open WhatsApp in new tab
+                    window.open(`https://wa.me/${targetNumber}?text=${whatsappMsg}`, '_blank');
+
+                    // Reset Form
+                    setTimeout(() => {
+                        form.reset();
+                        submitBtn.style.display = 'inline-flex';
+                        submitBtn.innerText = "SEND INQUIRY";
+                        successMsg.style.display = 'none';
+                    }, 3000);
+
+                }, 800);
+            });
+
+        });
+    </script>
+</body>
+
+</html>
