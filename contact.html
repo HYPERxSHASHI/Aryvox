@@ -37,7 +37,8 @@
             a,
             button,
             input,
-            textarea {
+            textarea,
+            .hamburger {
                 cursor: none;
             }
         }
@@ -46,15 +47,18 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 8px;
-            height: 8px;
+            width: 12px;
+            height: 12px;
             background: #FFF;
             mix-blend-mode: difference;
             border-radius: 50%;
             pointer-events: none;
             z-index: 100000;
             will-change: transform;
-            transition: opacity 0.2s;
+            transition: opacity 0.4s ease;
+            opacity: 0;
+            /* Hidden until preloader finishes */
+            transform: translate(-50%, -50%);
         }
 
         .cursor-ring {
@@ -69,10 +73,13 @@
             pointer-events: none;
             z-index: 99999;
             will-change: transform;
-            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+            transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s, opacity 0.4s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            /* Hidden until preloader finishes */
+            transform: translate(-50%, -50%);
         }
 
         .cursor-text {
@@ -94,7 +101,7 @@
         }
 
         .cursor-hover .cursor-dot {
-            transform: scale(0.5);
+            transform: translate(-50%, -50%) scale(0.5);
         }
 
         .cursor-btn-hover .cursor-ring {
@@ -170,8 +177,7 @@
         }
 
         .red-slash path {
-            stroke: #2ea043;
-            /* Changed to Green */
+            stroke: #FF4C4C;
             stroke-width: 6px;
             fill: none;
             stroke-linecap: round;
@@ -238,14 +244,22 @@
             position: fixed;
             top: 0;
             width: 100%;
-            z-index: 50000;
+            z-index: 50002;
+            /* Boosted to ensure hamburger is above overlay */
             background: rgba(252, 252, 253, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             padding: 16px 0;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, border-color 0.3s ease;
             will-change: transform;
+        }
+
+        nav.menu-open {
+            background: transparent !important;
+            border-bottom-color: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
 
         .nav-inner {
@@ -271,6 +285,48 @@
             background: var(--color-highlight);
             border-radius: 50%;
             box-shadow: 0 0 12px var(--color-highlight);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        /* LANDO NORRIS HOVER EFFECT */
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--text-main);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-main);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
         }
 
         .btn-outline {
@@ -302,14 +358,6 @@
             gap: 80px;
             align-items: start;
             min-height: 100vh;
-        }
-
-        @media (max-width: 900px) {
-            .contact-page-wrapper {
-                grid-template-columns: 1fr;
-                gap: 60px;
-                padding-top: 140px;
-            }
         }
 
         /* Left Side */
@@ -411,12 +459,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
         }
 
-        @media (max-width: 600px) {
-            .contact-form-wrapper {
-                padding: 30px 20px;
-            }
-        }
-
         .input-group {
             position: relative;
             margin-bottom: 40px;
@@ -488,7 +530,6 @@
             letter-spacing: 2px;
             transition: box-shadow 0.3s ease, background 0.3s ease;
             will-change: transform;
-            cursor: none;
             margin-top: 10px;
         }
 
@@ -507,6 +548,158 @@
             margin-top: 20px;
             font-size: 1.1rem;
         }
+
+        /* --- HAMBURGER MENU --- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 50003;
+            position: relative;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 2px;
+            background: var(--text-main);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: center;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        /* --- MOBILE MENU OVERLAY --- */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-page);
+            z-index: 50001;
+            /* Set below nav so the hamburger is always clickable */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .mobile-menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            text-align: center;
+        }
+
+        .mobile-menu-links a {
+            font-size: 2.5rem;
+            font-family: 'Archivo Black', sans-serif;
+            color: var(--text-main);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu-links a:hover {
+            color: var(--color-highlight);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 900px) {
+
+            /* Remove custom cursor completely on mobile/tablet */
+            .cursor-dot,
+            .cursor-ring {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+            }
+
+            body,
+            a,
+            button,
+            input,
+            textarea,
+            .hamburger,
+            .hover-target,
+            .hover-action {
+                cursor: auto !important;
+            }
+
+            /* Hide Desktop Nav Elements */
+            .nav-links,
+            .btn-outline {
+                display: none !important;
+            }
+
+            /* Show Hamburger */
+            .hamburger {
+                display: flex;
+            }
+
+            /* Keep Logo Left, Hamburger Right */
+            .nav-inner {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            /* Enforced Mobile Padding to prevent edge-hugging */
+            .container {
+                padding: 0 5vw;
+            }
+
+            .contact-page-wrapper {
+                grid-template-columns: 1fr;
+                gap: 50px;
+                padding-top: 130px;
+            }
+
+            /* Responsive Text Scaling for Mobile */
+            .contact-title {
+                font-size: clamp(2.5rem, 10vw, 4rem);
+            }
+
+            .contact-subtitle {
+                font-size: clamp(1.8rem, 8vw, 3rem);
+                margin-top: -5px;
+            }
+
+            .contact-form-wrapper {
+                padding: 40px 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .contact-form-wrapper {
+                padding: 30px 20px;
+                border-radius: 16px;
+            }
+
+            .contact-desc {
+                max-width: 100%;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -517,7 +710,8 @@
             <div class="loading-text-wrapper">
                 <div class="loading-text">ARYVOX.COM</div>
                 <svg class="red-slash" viewBox="0 0 300 100" preserveAspectRatio="none">
-                    <path d="M 40,60 Q 30,20 100,20 T 150,45 Q 165,80 200,60 Q 220,40 240,40 Q 270,40 280,20" />
+                    <path d="M 40,60 Q 30,20 100,20 T 150,45 Q 165,80 200,60 Q 220,40 240,40 Q 270,40 280,20"
+                        style="stroke: #FF4C4C; stroke-width: 5px; fill: none; stroke-linecap: round; stroke-linejoin: round;" />
                 </svg>
             </div>
             <div class="loading-percentage" id="counter">0%</div>
@@ -533,12 +727,38 @@
 
     <nav id="navbar">
         <div class="container nav-inner">
+
             <a href="index.html" class="logo hover-target">
                 <div class="logo-dot"></div> ARYVOX
             </a>
-            <a href="index.html" class="btn-outline hover-target magnet-btn">Back to Home</a>
+
+            <div class="nav-links">
+                <a href="index.html#work" class="nav-link hover-target">Work</a>
+                <a href="index.html#services" class="nav-link hover-target">Services</a>
+                <a href="index.html#process" class="nav-link hover-target">Workflow</a>
+                <a href="index.html#faq" class="nav-link hover-target">FAQ</a>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <a href="index.html" class="btn-outline hover-target magnet-btn">Back to Home</a>
+                <div class="hamburger hover-target" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
         </div>
     </nav>
+
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+        <div class="mobile-menu-links">
+            <a href="index.html" style="color: var(--color-highlight);">Home</a>
+            <a href="index.html#work">Work</a>
+            <a href="index.html#services">Services</a>
+            <a href="index.html#process">Workflow</a>
+            <a href="index.html#faq">FAQ</a>
+        </div>
+    </div>
 
     <main class="container contact-page-wrapper">
 
@@ -612,10 +832,116 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
+            const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
+            // --- SMART NAVBAR HIDE/SHOW ON SCROLL ---
+            const navbar = document.getElementById('navbar');
+            let lastScrollTop = 0;
+            window.addEventListener('scroll', () => {
+                let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    navbar.style.transform = 'translateY(-100%)';
+                } else {
+                    navbar.style.transform = 'translateY(0)';
+                }
+                lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            });
+
+            // --- MOBILE MENU LOGIC ---
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            if (hamburger && mobileMenuOverlay) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    mobileMenuOverlay.classList.toggle('active');
+                    navbar.classList.toggle('menu-open');
+
+                    if (mobileMenuOverlay.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                mobileMenuOverlay.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        mobileMenuOverlay.classList.remove('active');
+                        navbar.classList.remove('menu-open');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+
+            // --- CURSOR LOGIC ---
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorRing = document.getElementById('cursor-ring');
+            let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+            let ringX = mouseX, ringY = mouseY;
+
+            if (!isTouchDevice) {
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+
+                function renderLoop() {
+                    if (cursorDot) cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+                    ringX += (mouseX - ringX) * 0.15;
+                    ringY += (mouseY - ringY) * 0.15;
+                    if (cursorRing) cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+
+                    requestAnimationFrame(renderLoop);
+                }
+                requestAnimationFrame(renderLoop);
+
+                // Cursor Hover States
+                document.querySelectorAll('.hover-target').forEach(target => {
+                    target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                    target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+                });
+
+                document.querySelectorAll('.hover-action').forEach(target => {
+                    target.addEventListener('mouseenter', () => document.body.classList.add('cursor-btn-hover'));
+                    target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-btn-hover'));
+                });
+            }
+
+            // --- MAGNETIC BUTTONS ---
+            if (!isTouchDevice) {
+                const magneticButtons = document.querySelectorAll('.magnet-btn');
+                magneticButtons.forEach(btn => {
+                    btn.addEventListener('mouseenter', () => {
+                        gsap.to(btn, { scale: 1.05, duration: 0.3, ease: "power2.out", overwrite: "auto" });
+                    });
+                    btn.addEventListener('mousemove', (e) => {
+                        const rect = btn.getBoundingClientRect();
+                        const x = (e.clientX - rect.left - rect.width / 2);
+                        const y = (e.clientY - rect.top - rect.height / 2);
+                        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power3.out", overwrite: "auto" });
+                    });
+                    btn.addEventListener('mouseleave', () => {
+                        gsap.to(btn, { x: 0, y: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.3)", overwrite: "auto" });
+                    });
+                });
+            }
+
             // --- PRELOADER ---
             const preloader = document.getElementById('preloader');
             const counterText = document.getElementById('counter');
             const redSlash = document.querySelector('.red-slash path');
+            const preloaderTextWrapper = document.querySelector('.loading-text-wrapper');
+
+            if (!isTouchDevice) {
+                window.addEventListener('mousemove', (e) => {
+                    if (preloader && !preloader.classList.contains('loaded') && preloaderTextWrapper) {
+                        const x = (window.innerWidth / 2 - e.clientX) / 40;
+                        const y = (window.innerHeight / 2 - e.clientY) / 40;
+                        preloaderTextWrapper.style.transform = `translate(${x}px, ${y}px)`;
+                    }
+                });
+            }
 
             if (redSlash) {
                 const pathLength = redSlash.getTotalLength();
@@ -635,6 +961,12 @@
                         setTimeout(() => {
                             gsap.to(preloader, { yPercent: -100, duration: 1, ease: 'power4.inOut' });
 
+                            // Trigger Cursor Reveal
+                            if (!isTouchDevice) {
+                                if (cursorDot) cursorDot.style.opacity = 1;
+                                if (cursorRing) cursorRing.style.opacity = 1;
+                            }
+
                             // Intro Animations
                             gsap.to('.gsap-reveal-text', { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: 'power4.out', delay: 0.2 });
                             gsap.fromTo('.gsap-fade', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.6 });
@@ -648,54 +980,6 @@
                     .to(loaderState, { percent: 30, duration: 0.4, ease: "none" })
                     .to(loaderState, { percent: 100, duration: 1, ease: "power2.inOut" });
             }
-
-            // --- CURSOR LOGIC ---
-            const cursorDot = document.getElementById('cursor-dot');
-            const cursorRing = document.getElementById('cursor-ring');
-            let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-            let ringX = mouseX, ringY = mouseY;
-
-            window.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
-
-            function renderLoop() {
-                if (cursorDot) cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-                ringX += (mouseX - ringX) * 0.15;
-                ringY += (mouseY - ringY) * 0.15;
-                if (cursorRing) cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
-                requestAnimationFrame(renderLoop);
-            }
-            requestAnimationFrame(renderLoop);
-
-            // Cursor Hover States
-            document.querySelectorAll('.hover-target').forEach(target => {
-                target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-                target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-            });
-
-            document.querySelectorAll('.hover-action').forEach(target => {
-                target.addEventListener('mouseenter', () => document.body.classList.add('cursor-btn-hover'));
-                target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-btn-hover'));
-            });
-
-            // --- MAGNETIC BUTTONS ---
-            const magneticButtons = document.querySelectorAll('.magnet-btn');
-            magneticButtons.forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    gsap.to(btn, { scale: 1.05, duration: 0.3, ease: "power2.out", overwrite: "auto" });
-                });
-                btn.addEventListener('mousemove', (e) => {
-                    const rect = btn.getBoundingClientRect();
-                    const x = (e.clientX - rect.left - rect.width / 2);
-                    const y = (e.clientY - rect.top - rect.height / 2);
-                    gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power3.out", overwrite: "auto" });
-                });
-                btn.addEventListener('mouseleave', () => {
-                    gsap.to(btn, { x: 0, y: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.3)", overwrite: "auto" });
-                });
-            });
 
             // --- WHATSAPP FORM INTEGRATION ---
             const form = document.getElementById('contact-form');
